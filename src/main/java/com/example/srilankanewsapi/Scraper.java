@@ -11,6 +11,7 @@ import java.util.List;
 public class Scraper {
     public static List<News> scrapeNews() {
         List<News> news = new ArrayList<>();
+
         try {
             // Fetch the HTML content
             String url = "https://www.lankadeepa.lk/latest_news/1";
@@ -42,6 +43,33 @@ public class Scraper {
             }
         } catch (IOException e) {
             System.err.println("Error fetching page: " + e.getMessage());
+        }
+
+        try {
+            // Fetch the HTML content from BBC Sinhala
+            String url = "https://www.bbc.com/sinhala/topics/cg7267dz901t";
+            Document document = Jsoup.connect(url).get();
+
+            // Select all elements containing news titles and links
+            Elements titleElements = document.select(".bbc-6e44zt.e47bds20");
+
+            // Select all elements containing news dates
+            Elements dateElements = document.select(".promo-timestamp.bbc-11oryzm.e1mklfmt0");
+
+            // Extract data
+            int size = Math.min(titleElements.size(), dateElements.size()); // Ensure safe indexing
+            for (int i = 0; i < size; i++) {
+                Element titleElement = titleElements.get(i);
+                Element dateElement = dateElements.get(i);
+
+                String title = titleElement.text();
+                String source = titleElement.selectFirst("a") != null ? titleElement.selectFirst("a").attr("href") : "#";
+                String date = dateElement.text();
+
+                news.add(new News(title,"",source));
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
         }
 
         return news;
