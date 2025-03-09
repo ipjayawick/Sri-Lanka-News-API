@@ -104,6 +104,50 @@ public class Scraper {
         } catch (IOException e) {
             e.printStackTrace();
         }
+//
+//        try {
+//            List<News> newsFistNews = new ArrayList<>();
+//            // Fetch the HTML content from BBC Sinhala
+//            String url = "https://sinhala.adaderana.lk/";
+//            Document document = Jsoup.connect(url).get();
+//
+//            Elements elements=document.select("div.hot-news.news-story");
+//
+//            for (Element element : elements) {
+//                Element newsElement=element.selectFirst("div.story-text");
+//                String topic = newsElement.selectFirst("h3 a").text();
+//                String imageUrl=newsElement.selectFirst("div.thumb-image a img").attr("src");
+//                String description=newsElement.selectFirst("p").text();
+//                String link=newsElement.selectFirst("a").attr("href");
+//                newsFistNews.add(new News(topic,description,url+link,imageUrl));
+//            }
+//            newsMap.put("adaDerana",newsFistNews);
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+
+        try {
+            List<News> hiruNews = new ArrayList<>();
+            // Fetch the HTML content from BBC Sinhala
+            String url = "https://www.hirunews.lk/";
+            Document document = Jsoup.connect(url).get();
+
+            Elements elements=document.select("div.main-article-section div.row");
+
+            for (Element element : elements) {
+                Element aTag= element.selectFirst("div.column.left");
+                Element aTag2=element.selectFirst("div.column.middle div.section-tittle a");
+                if(aTag==null || aTag2==null) continue;
+                String topic= aTag2.text();
+                String imageUrl=aTag.select("img").attr("data-src");
+                String description="";
+                String link=aTag.selectFirst("a").attr("href");
+                hiruNews.add(new News(topic,description,link,imageUrl));
+            }
+            newsMap.put("hiru",hiruNews);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
         return newsMap;
     }
