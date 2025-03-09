@@ -20,27 +20,21 @@ public class Scraper {
             String url = "https://www.lankadeepa.lk/latest_news/1";
             Document document = Jsoup.connect(url).get();
 
-            // Select the <section> tag with class 'bg0 p-t-10 p-b-0'
             Element latestSection = document.selectFirst("section.bg0.p-t-10.p-b-0");
 
-            // Check if the section is found
             if (latestSection != null) {
-                // Select the div with class 'flex-wr-sb-s p-t-20 p-b-15 how-bor2 row'
                 Elements postDivs = latestSection.select("div.flex-wr-sb-s.p-t-20.p-b-15.how-bor2.row");
 
                 for (Element postDiv : postDivs) {
-                    // Extract the first <a> tag's href attribute
                     String source = postDiv.selectFirst("a").attr("href");
                     String imageUrl= postDiv.selectFirst("a").selectFirst("img").attr("src");
 
-                    // Extract the topic and description
                     Element col7Div = postDiv.selectFirst(".col-7");
                     if (col7Div != null) {
                         Elements h5Tags = col7Div.select("h5");
                         String topic = h5Tags.first() != null ? h5Tags.first().text().trim() : "";
                         String description = h5Tags.last() != null ? h5Tags.last().text().trim() : "";
 
-                        // Store the extracted data in the list
                         lankadeepaNews.add(new News(topic, description,source,imageUrl));
                     }
                 }
@@ -52,21 +46,16 @@ public class Scraper {
 
         try {
             List<News> bbcNews = new ArrayList<>();
-            // Fetch the HTML content from BBC Sinhala
             String url = "https://www.bbc.com/sinhala/topics/cg7267dz901t";
             Document document = Jsoup.connect(url).get();
 
-            // Select all elements containing news titles and links
             Elements titleElements = document.select(".bbc-6e44zt.e47bds20");
 
-            // Select all elements containing news dates
             Elements dateElements = document.select(".promo-timestamp.bbc-11oryzm.e1mklfmt0");
 
-            //Select all elements containing images
             Elements imageElements = document.select(".bbc-139onq");
 
-            // Extract data
-            int size = Math.min(titleElements.size(), dateElements.size()); // Ensure safe indexing
+            int size = Math.min(titleElements.size(), dateElements.size());
             for (int i = 0; i < size; i++) {
                 Element titleElement = titleElements.get(i);
                 Element dateElement = dateElements.get(i);
@@ -86,7 +75,6 @@ public class Scraper {
 
         try {
             List<News> adaDeranaNews = new ArrayList<>();
-            // Fetch the HTML content from BBC Sinhala
             String url = "https://sinhala.adaderana.lk/";
             Document document = Jsoup.connect(url).get();
 
@@ -104,31 +92,30 @@ public class Scraper {
         } catch (IOException e) {
             e.printStackTrace();
         }
-//
-//        try {
-//            List<News> newsFistNews = new ArrayList<>();
-//            // Fetch the HTML content from BBC Sinhala
-//            String url = "https://sinhala.adaderana.lk/";
-//            Document document = Jsoup.connect(url).get();
-//
-//            Elements elements=document.select("div.hot-news.news-story");
-//
-//            for (Element element : elements) {
-//                Element newsElement=element.selectFirst("div.story-text");
-//                String topic = newsElement.selectFirst("h3 a").text();
-//                String imageUrl=newsElement.selectFirst("div.thumb-image a img").attr("src");
-//                String description=newsElement.selectFirst("p").text();
-//                String link=newsElement.selectFirst("a").attr("href");
-//                newsFistNews.add(new News(topic,description,url+link,imageUrl));
-//            }
-//            newsMap.put("adaDerana",newsFistNews);
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
+
+        try {
+            List<News> newsFistNews = new ArrayList<>();
+            String url = "https://sinhala.newsfirst.lk/latest-news/";
+            Document document = Jsoup.connect(url).get();
+
+            Elements elements=document.select("div.lap_news_div div div div div.local_news_main div.ng-star-inserted");
+
+            for (Element element : elements) {
+                Element newsElement=element.selectFirst("a");
+                String topic = newsElement.selectFirst("div div h2.local_news_sub_header").text();
+
+                String imageUrl=newsElement.selectFirst("div img").attr("src");
+                String description=newsElement.selectFirst("div div div.top_stories_sub_detail").text().split("-")[1];
+                String link=newsElement.attr("href");
+                newsFistNews.add(new News(topic,description,url+link,imageUrl));
+            }
+            newsMap.put("newsFirst",newsFistNews);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
         try {
             List<News> hiruNews = new ArrayList<>();
-            // Fetch the HTML content from BBC Sinhala
             String url = "https://www.hirunews.lk/";
             Document document = Jsoup.connect(url).get();
 
