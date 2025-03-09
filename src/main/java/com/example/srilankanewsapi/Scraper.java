@@ -7,13 +7,15 @@ import org.jsoup.select.Elements;
 import java.io.IOException;
 import java.sql.SQLOutput;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 public class Scraper {
-    public static List<News> scrapeNews() {
-        List<News> news = new ArrayList<>();
+    public static HashMap<String, List> scrapeNews() {
+        HashMap<String, List> newsMap = new HashMap<>();
 
         try {
+            List<News> lankadeepaNews = new ArrayList<>();
             // Fetch the HTML content
             String url = "https://www.lankadeepa.lk/latest_news/1";
             Document document = Jsoup.connect(url).get();
@@ -39,15 +41,17 @@ public class Scraper {
                         String description = h5Tags.last() != null ? h5Tags.last().text().trim() : "";
 
                         // Store the extracted data in the list
-                        news.add(new News(topic, description,source,imageUrl));
+                        lankadeepaNews.add(new News(topic, description,source,imageUrl));
                     }
                 }
+                newsMap.put("lankadeepa",lankadeepaNews);
             }
         } catch (IOException e) {
             System.err.println("Error fetching page: " + e.getMessage());
         }
 
         try {
+            List<News> bbcNews = new ArrayList<>();
             // Fetch the HTML content from BBC Sinhala
             String url = "https://www.bbc.com/sinhala/topics/cg7267dz901t";
             Document document = Jsoup.connect(url).get();
@@ -73,12 +77,34 @@ public class Scraper {
                 String date = dateElement.text();
                 String imageUrl=imageElement.attr("src");
 
-                news.add(new News(title,"",source,imageUrl));
+                bbcNews.add(new News(title,"",source,imageUrl));
             }
+            newsMap.put("bbc",bbcNews);
         } catch (IOException e) {
             e.printStackTrace();
         }
 
-        return news;
+        try {
+            List<News> adaDeranaNews = new ArrayList<>();
+            // Fetch the HTML content from BBC Sinhala
+            String url = "https://sinhala.adaderana.lk/";
+            Document document = Jsoup.connect(url).get();
+
+            Elements elements=document.select("div.hot-news.news-story");
+
+            for (Element element : elements) {
+                Element newsElement=element.selectFirst("div.story-text");
+                String topic = newsElement.selectFirst("h3 a").text();
+                String imageUrl=newsElement.selectFirst("div.thumb-image a img").attr("src");
+                String description=newsElement.selectFirst("p").text();
+                String link=newsElement.selectFirst("a").attr("href");
+                adaDeranaNews.add(new News(topic,description,url+link,imageUrl));
+            }
+            newsMap.put("adaDerana",adaDeranaNews);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return newsMap;
     }
 }
