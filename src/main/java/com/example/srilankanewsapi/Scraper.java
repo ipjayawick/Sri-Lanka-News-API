@@ -107,7 +107,7 @@ public class Scraper {
                 String imageUrl=newsElement.selectFirst("div img").attr("src");
                 String description=newsElement.selectFirst("div div div.top_stories_sub_detail").text().split("-")[1];
                 String link=newsElement.attr("href");
-                newsFistNews.add(new News(topic,description,url+link,imageUrl));
+                newsFistNews.add(new News(topic,description,"https://sinhala.newsfirst.lk"+link,imageUrl));
             }
             newsMap.put("newsFirst",newsFistNews);
         } catch (IOException e) {
